@@ -1,0 +1,16 @@
+{
+  "name": "com.vertx.variants",
+  "displayName": "ScriptableObject Variants",
+  "version": "0.0.1",
+  "unity": "2020.3",
+  "description": "Variants for Scriptable Objects.",
+  "author": {
+    "name": "Vertx",
+    "url": "https://github.com/vertxxyz"
+  },
+  "keywords": [],
+  "category": "Tools",
+  "dependencies": {
+    "com.unity.nuget.newtonsoft-json" : "1.0.1"
+  }
+}

@@ -1,0 +1,14 @@
+{
+    "name": "Vertx.Variants.Runtime",
+    "rootNamespace": "Vertx.Variants",
+    "references": [],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": true,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

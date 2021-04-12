@@ -1,0 +1,20 @@
+{
+    "name": "Vertx.Variants.Editor",
+    "rootNamespace": "Vertx.Variants.Editor",
+    "references": [
+        "GUID:4985ec84c0dbd8c40bff44740bb765e6"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": true,
+    "precompiledReferences": [
+        "Newtonsoft.Json.dll"
+    ],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
