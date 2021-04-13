@@ -42,15 +42,26 @@ namespace Vertx.Variants.Editor
 			if (overrideData?.Overrides.Count > 0)
 			{
 				using var so = new SerializedObject(variant);
+				List<string> toRemove = null;
 				foreach (KeyValuePair<string,JToken> dataOverride in overrideData.Overrides)
 				{
 					SerializedProperty property = so.FindProperty(dataOverride.Key);
 					if (property == null)
 					{
 						Debug.LogWarning($"{dataOverride.Key} no longer exists in {variant}");
+						toRemove ??= new List<string>();
+						toRemove.Add(dataOverride.Key);
 						continue;
 					}
 					SetProperty(property, dataOverride.Value);
+				}
+
+				if (toRemove != null)
+				{
+					foreach (string s in toRemove)
+						overrideData.Overrides.Remove(s);
+					Json = JsonConvert.SerializeObject(overrideData);
+					EditorUtility.SetDirty(this);
 				}
 
 				so.ApplyModifiedPropertiesWithoutUndo();
