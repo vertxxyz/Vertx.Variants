@@ -39,6 +39,13 @@ namespace Vertx.Variants.Editor
 
 			if (assetTarget != null)
 			{
+				if (assetTarget is DefaultAsset)
+				{
+					assetPath = null;
+					bound = false;
+					return;
+				}
+
 				assetPath = AssetDatabase.GetAssetPath(assetTarget);
 
 				if (addToDelegates)
@@ -142,19 +149,10 @@ namespace Vertx.Variants.Editor
 				return;
 
 			SerializedProperty tempProp = temporaryVariantEditor.serializedObject.GetIterator();
-			//SerializedProperty targetProp = variantSerializedObject.GetIterator();
 			tempProp.NextVisible(true);
 			while (tempProp.NextVisible(true))
 			{
 				if (tempProp.propertyPath == "m_Script") continue;
-				/*targetProp.Next(true);
-						if (tempProp.propertyPath != targetProp.propertyPath)
-						{
-							Debug.LogError("properties have become unsynced.\n" +
-							               $"origin: \"{tempProp.propertyPath}\"\n" +
-							               $"target: \"{targetProp.propertyPath}\"");
-							break;
-						}*/
 				if (tempProp.propertyType == SerializedPropertyType.Generic) continue;
 				if (!assetSerializedObject.CopyFromSerializedPropertyIfDifferent(tempProp)) continue;
 				assetSerializedObject.ApplyModifiedProperties();

@@ -142,7 +142,5 @@ namespace Vertx.Variants.Editor
 			temporaryVariantEditor.serializedObject.ApplyModifiedProperties();
 			Repaint();
 		}
-
-		private T GetProperty<T>(string path) => overrideData.Overrides[path].ToObject<T>();
 	}
 }

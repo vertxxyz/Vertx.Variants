@@ -121,11 +121,13 @@ namespace Vertx.Variants.Editor
 	}
 
 	[Serializable]
-	internal struct GradientSerializable
+	internal class GradientSerializable
 	{
 		public int Mode;
 		public GradientAlphaKeySerializable[] AlphaKeys;
 		public GradientColorKeySerializable[] ColorKeys;
+
+		public GradientSerializable() { }
 
 		public GradientSerializable(Gradient g)
 		{
@@ -202,6 +204,8 @@ namespace Vertx.Variants.Editor
 	internal class AnimationCurveSerializable
 	{
 		public KeyframeSerializable[] Keyframes;
+
+		public AnimationCurveSerializable() { }
 
 		public AnimationCurveSerializable(AnimationCurve curve)
 		{
