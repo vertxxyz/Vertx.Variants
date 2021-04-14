@@ -43,10 +43,16 @@ namespace Vertx.Variants.Editor
 
 				if (addToDelegates)
 				{
+					EditorApplication.contextualPropertyMenu -= ContextualPropertyMenu;
 					EditorApplication.contextualPropertyMenu += ContextualPropertyMenu;
 
-					MethodInfo beginProperty = typeof(EditorGUIUtility).GetMethod("add_beginProperty", BindingFlags.Static | BindingFlags.NonPublic);
-					beginProperty.Invoke(null, new object[] {new Action<Rect, SerializedProperty>(BeginProperty)});
+					Type editorGUIUtilityType = typeof(EditorGUIUtility);
+					MethodInfo beginPropertyAdd = editorGUIUtilityType.GetMethod("add_beginProperty", BindingFlags.Static | BindingFlags.NonPublic);
+					MethodInfo beginPropertyRemove = typeof(EditorGUIUtility).GetMethod("remove_beginProperty", BindingFlags.Static | BindingFlags.NonPublic);
+					var action = new Action<Rect, SerializedProperty>(BeginProperty);
+					var parameters = new object[] {action};
+					beginPropertyRemove.Invoke(null, parameters);
+					beginPropertyAdd.Invoke(null, parameters);
 				}
 
 				temporaryVariant = (ScriptableObject) Instantiate(assetTarget);
@@ -124,10 +130,10 @@ namespace Vertx.Variants.Editor
 			if (temporaryVariantEditor == null)
 			{
 				if (assetTarget != null)
-					Refresh(addToDelegates: false);
+					Refresh();
 				return;
 			}
-
+			
 			using var cCS = new EditorGUI.ChangeCheckScope();
 
 			temporaryVariantEditor.OnInspectorGUI();

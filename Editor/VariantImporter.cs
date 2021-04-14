@@ -23,6 +23,8 @@ namespace Vertx.Variants.Editor
 
 		public override void OnImportAsset(AssetImportContext ctx)
 		{
+			Debug.Log($"import {assetPath}");
+			
 			void CreateFallback()
 			{
 				ScriptableObjectVariantFallback variantBase = ScriptableObject.CreateInstance<ScriptableObjectVariantFallback>();
@@ -37,14 +39,15 @@ namespace Vertx.Variants.Editor
 				return;
 			}
 
-			string dependencyPath = AssetDatabase.GUIDToAssetPath(Origin);
+			var originGUID = new GUID(Origin);
+			string dependencyPath = AssetDatabase.GUIDToAssetPath(originGUID);
 			if (string.IsNullOrEmpty(dependencyPath))
 			{
 				CreateFallback();
 				return;
 			}
 
-			ctx.DependsOnArtifact(new GUID(Origin));
+			ctx.DependsOnArtifact(originGUID);
 			
 			// We need to reload the dependency from the asset database or else it doesn't know we depend on it.
 			var dependency = AssetDatabase.LoadAssetAtPath<ScriptableObject>(dependencyPath);
