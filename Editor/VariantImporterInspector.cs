@@ -53,7 +53,7 @@ namespace Vertx.Variants.Editor
 				temporaryVariantEditor = CreateEditor(temporaryVariant);
 
 				string json = ((VariantImporter) target).Json;
-				if(!string.IsNullOrEmpty(json))
+				if (!string.IsNullOrEmpty(json))
 					overrideData = JsonConvert.DeserializeObject<OverrideData>(json);
 
 				VariantImporter.OnImport += OnImport;
@@ -64,8 +64,8 @@ namespace Vertx.Variants.Editor
 				assetPath = null;
 				bound = false;
 			}
-			
-			if(repaint)
+
+			if (repaint)
 				Repaint();
 		}
 
@@ -122,7 +122,11 @@ namespace Vertx.Variants.Editor
 		public override void OnInspectorGUI()
 		{
 			if (temporaryVariantEditor == null)
+			{
+				if (assetTarget != null)
+					Refresh(addToDelegates: false);
 				return;
+			}
 
 			using var cCS = new EditorGUI.ChangeCheckScope();
 
