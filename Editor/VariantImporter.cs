@@ -19,6 +19,8 @@ namespace Vertx.Variants.Editor
 		public string Origin;
 		public string Json;
 
+		public static event Action<string> OnImport;
+
 		public override void OnImportAsset(AssetImportContext ctx)
 		{
 			void CreateFallback()
@@ -26,6 +28,7 @@ namespace Vertx.Variants.Editor
 				ScriptableObjectVariantFallback variantBase = ScriptableObject.CreateInstance<ScriptableObjectVariantFallback>();
 				ctx.AddObjectToAsset(nameof(variantBase), variantBase);
 				ctx.SetMainObject(variantBase);
+				OnImport?.Invoke(assetPath);
 			}
 
 			if (Origin == default)
@@ -87,6 +90,8 @@ namespace Vertx.Variants.Editor
 			variant.name = Path.GetFileNameWithoutExtension(assetPath);
 			ctx.AddObjectToAsset(nameof(variant), variant);
 			ctx.SetMainObject(variant);
+			
+			OnImport?.Invoke(assetPath);
 		}
 
 		[MenuItem("Assets/Create/ScriptableObject Variant", true, 91)]

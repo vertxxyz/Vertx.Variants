@@ -23,33 +23,56 @@ namespace Vertx.Variants.Editor
 		/// </summary>
 		private ScriptableObject temporaryVariant;
 		private UnityEditor.Editor temporaryVariantEditor;
+		private string assetPath;
 
 		private bool bound;
 
 		protected override void Awake()
 		{
 			base.Awake();
+			Refresh(false);
+		}
 
+		private void Refresh(bool repaint = true, bool addToDelegates = true)
+		{
 			temporaryVariantEditor = null;
 
 			if (assetTarget != null)
 			{
-				EditorApplication.contextualPropertyMenu += ContextualPropertyMenu;
+				assetPath = AssetDatabase.GetAssetPath(assetTarget);
+
+				if (addToDelegates)
+				{
+					EditorApplication.contextualPropertyMenu += ContextualPropertyMenu;
+
+					MethodInfo beginProperty = typeof(EditorGUIUtility).GetMethod("add_beginProperty", BindingFlags.Static | BindingFlags.NonPublic);
+					beginProperty.Invoke(null, new object[] {new Action<Rect, SerializedProperty>(BeginProperty)});
+				}
 
 				temporaryVariant = (ScriptableObject) Instantiate(assetTarget);
 				temporaryVariantEditor = CreateEditor(temporaryVariant);
-				MethodInfo beginProperty = typeof(EditorGUIUtility).GetMethod("add_beginProperty", BindingFlags.Static | BindingFlags.NonPublic);
-				beginProperty.Invoke(null, new object[] {new Action<Rect, SerializedProperty>(BeginProperty)});
 
 				string json = ((VariantImporter) target).Json;
 				if(!string.IsNullOrEmpty(json))
 					overrideData = JsonConvert.DeserializeObject<OverrideData>(json);
+
+				VariantImporter.OnImport += OnImport;
 				bound = true;
 			}
 			else
 			{
+				assetPath = null;
 				bound = false;
 			}
+			
+			if(repaint)
+				Repaint();
+		}
+
+		private void OnImport(string path)
+		{
+			if (path != assetPath) return;
+			EditorApplication.delayCall += () => Refresh(addToDelegates: false);
 		}
 
 		private void ContextualPropertyMenu(GenericMenu menu, SerializedProperty property)
@@ -86,6 +109,7 @@ namespace Vertx.Variants.Editor
 				DestroyImmediate(temporaryVariant, true);
 
 			EditorApplication.contextualPropertyMenu -= ContextualPropertyMenu;
+			VariantImporter.OnImport -= OnImport;
 
 			if (bound)
 			{
