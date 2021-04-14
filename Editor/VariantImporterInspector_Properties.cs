@@ -126,9 +126,9 @@ namespace Vertx.Variants.Editor
 			var variantImporter = (VariantImporter) target;
 			
 			// Apply changes to the importer (and request a reimport)
-			Undo.RecordObject(variantImporter, "Reverted Property Modification");
-			variantImporter.Json = JsonConvert.SerializeObject(overrideData);
-			variantImporter.SaveAndReimport();
+			serializedObject.FindProperty(nameof(VariantImporter.Json)).stringValue = JsonConvert.SerializeObject(overrideData);
+			serializedObject.ApplyModifiedProperties();
+			AssetDatabase.ImportAsset(variantImporter.assetPath, ImportAssetOptions.ForceSynchronousImport);
 			
 			// Ensure the temporary variant (our fake inspector) is also reverted to the origin's data.
 			if (string.IsNullOrEmpty(variantImporter.Origin))

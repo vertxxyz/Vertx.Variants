@@ -17,12 +17,6 @@ namespace Vertx.Variants.Editor
 		private static readonly GUIContent baseLabel = new GUIContent("Base");
 
 		/// <summary>
-		/// The actual variant we want to write to and manage.
-		/// </summary>
-		private ScriptableObject variant;
-		private SerializedObject variantSerializedObject;
-
-		/// <summary>
 		/// A temporary object we instance purely so the editor isn't read-only.
 		/// If we use variant, then because it is an imported asset the editor is GUI disabled.
 		/// There doesn't seem to be a way around this, disappointingly.
@@ -37,14 +31,12 @@ namespace Vertx.Variants.Editor
 			base.Awake();
 
 			temporaryVariantEditor = null;
-			variant = ((ScriptableObjectVariant) assetTarget).Variant;
-			variantSerializedObject = new SerializedObject(variant);
 
-			if (variant != null)
+			if (assetTarget != null)
 			{
 				EditorApplication.contextualPropertyMenu += ContextualPropertyMenu;
 
-				temporaryVariant = Instantiate(variant);
+				temporaryVariant = (ScriptableObject) Instantiate(assetTarget);
 				temporaryVariantEditor = CreateEditor(temporaryVariant);
 				MethodInfo beginProperty = typeof(EditorGUIUtility).GetMethod("add_beginProperty", BindingFlags.Static | BindingFlags.NonPublic);
 				beginProperty.Invoke(null, new object[] {new Action<Rect, SerializedProperty>(BeginProperty)});
@@ -130,8 +122,8 @@ namespace Vertx.Variants.Editor
 							break;
 						}*/
 				if (tempProp.propertyType == SerializedPropertyType.Generic) continue;
-				if (!variantSerializedObject.CopyFromSerializedPropertyIfDifferent(tempProp)) continue;
-				variantSerializedObject.ApplyModifiedProperties();
+				if (!assetSerializedObject.CopyFromSerializedPropertyIfDifferent(tempProp)) continue;
+				assetSerializedObject.ApplyModifiedProperties();
 				ModifiedProperty(tempProp.propertyPath, tempProp);
 			}
 		}

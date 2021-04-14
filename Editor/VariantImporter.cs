@@ -21,19 +21,36 @@ namespace Vertx.Variants.Editor
 
 		public override void OnImportAsset(AssetImportContext ctx)
 		{
-			ScriptableObjectVariant variantBase = ScriptableObject.CreateInstance<ScriptableObjectVariant>();
-			ctx.AddObjectToAsset(nameof(variantBase), variantBase);
-			ctx.SetMainObject(variantBase);
+			void CreateFallback()
+			{
+				ScriptableObjectVariantFallback variantBase = ScriptableObject.CreateInstance<ScriptableObjectVariantFallback>();
+				ctx.AddObjectToAsset(nameof(variantBase), variantBase);
+				ctx.SetMainObject(variantBase);
+			}
+
 			if (Origin == default)
+			{
+				CreateFallback();
 				return;
+			}
 
 			string dependencyPath = AssetDatabase.GUIDToAssetPath(Origin);
 			if (string.IsNullOrEmpty(dependencyPath))
+			{
+				CreateFallback();
 				return;
+			}
+
 			ctx.DependsOnArtifact(new GUID(Origin));
 			
 			// We need to reload the dependency from the asset database or else it doesn't know we depend on it.
 			var dependency = AssetDatabase.LoadAssetAtPath<ScriptableObject>(dependencyPath);
+
+			if (dependency == null)
+			{
+				CreateFallback();
+				return;
+			}
 
 			ScriptableObject variant = Instantiate(dependency);
 
@@ -67,27 +84,9 @@ namespace Vertx.Variants.Editor
 				so.ApplyModifiedPropertiesWithoutUndo();
 			}
 			
-			variantBase.Variant = variant;
 			variant.name = Path.GetFileNameWithoutExtension(assetPath);
 			ctx.AddObjectToAsset(nameof(variant), variant);
-		}
-
-		[InitializeOnLoadMethod]
-		private static void SetUpAssetDrag()
-		{
-			EditorApplication.update -= Update;
-			EditorApplication.update += Update;
-		}
-
-		private static void Update()
-		{
-			// Unity does not allow us to easily replicate the behaviour shown by dragging a Sprite into either a Sprite or Texture2D-bound Object Field.
-			// This is my hack to resolve that discrepancy.
-			Object[] dragging = DragAndDrop.objectReferences;
-			if (dragging.Length != 1)
-				return;
-			if (dragging[0] is ScriptableObjectVariant variant)
-				DragAndDrop.objectReferences = new Object[] {variant.Variant};
+			ctx.SetMainObject(variant);
 		}
 
 		[MenuItem("Assets/Create/ScriptableObject Variant", true, 91)]
